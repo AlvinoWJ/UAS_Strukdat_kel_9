@@ -2,7 +2,7 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <string.h>
-    
+
 // Struktur untuk Kelas (Double Linked List)
 
 // Struktur untuk Stack Aktivitas
@@ -13,7 +13,7 @@
 
 // Variabel Global
 
-
+//testteerr
 
 // menu utama
 
