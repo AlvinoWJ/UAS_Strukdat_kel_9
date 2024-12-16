@@ -4,7 +4,11 @@
 #include <string.h>
 
 // Struktur untuk Kelas (Double Linked List)
-
+typedef struct NodeKelas {
+    char namaKelas[50];
+    struct NodeKelas *prev;
+    struct NodeKelas *next;
+} NodeKelas;
 
 // Struktur untuk Stack Aktivitas
 
