@@ -37,7 +37,32 @@ typedef struct Que {
 
 
 // Menu kelas 
+void menuKelas(DaftarKelas *daftar) {
+    int pilihan;
+    do {
+        printf("\n--- Menu Kelas ---\n");
+        printf("1. Tambah Kelas\n");
+        printf("2. Hapus Kelas\n");
+        printf("3. Kembali ke Menu Utama\n");
+        printf("Pilih menu (1-3): ");
+        scanf("%d", &pilihan);
+        getchar(); // Membersihkan newline
 
+        switch(pilihan) {
+            case 1:
+                tambahKelas(daftar);
+                break;
+            case 2:
+                hapusKelas(daftar);
+                break;
+            case 3:
+                printf("Kembali ke Menu Utama.\n");
+                break;
+            default:
+                printf("Pilihan tidak valid. Silakan coba lagi.\n");
+        }
+    } while (pilihan != 4);
+}
 
 // menu Aktifitas 
 
