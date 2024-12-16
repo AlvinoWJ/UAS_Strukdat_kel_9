@@ -51,7 +51,77 @@ typedef struct Que {
 
 
 // Fungsi kelas 
+void tambahKelas(DaftarKelas *daftar) {
+    char namaKelas[50];
+    printf("Masukkan nama kelas baru: ");
+    fgets(namaKelas, sizeof(namaKelas), stdin);
+    namaKelas[strcspn(namaKelas, "\n")] = '\0';
 
+    NodeKelas *kelasBaruNode = (NodeKelas*)malloc(sizeof(NodeKelas));
+    if (kelasBaruNode == NULL) {
+        printf("Gagal mengalokasikan memori untuk kelas baru.\n");
+        return;
+    }
+
+    strcpy(kelasBaruNode->namaKelas, namaKelas);
+    kelasBaruNode->prev = NULL;
+    kelasBaruNode->next = NULL;
+
+    if (daftar->head == NULL) {
+        // Jika daftar kosong
+        daftar->head = kelasBaruNode;
+        daftar->tail = kelasBaruNode;
+    } else {
+        // Tambahkan di akhir daftar
+        kelasBaruNode->prev = daftar->tail;
+        daftar->tail->next = kelasBaruNode;
+        daftar->tail = kelasBaruNode;
+    }
+
+    daftar->count++;
+    printf("Kelas '%s' berhasil ditambahkan.\n", namaKelas);
+}
+
+// Fungsi untuk menghapus kelas
+void hapusKelas(DaftarKelas *daftar) {
+    if (daftar->head == NULL) {
+        printf("Tidak ada kelas untuk dihapus.\n");
+        return;
+    }
+
+    char namaKelas[50];
+    printf("Masukkan nama kelas yang akan dihapus: ");
+    fgets(namaKelas, sizeof(namaKelas), stdin);
+    namaKelas[strcspn(namaKelas, "\n")] = '\0';
+
+    NodeKelas *current = daftar->head;
+    while (current != NULL) {
+        if (strcmp(current->namaKelas, namaKelas) == 0) {
+            // Hapus node yang ditemukan
+            if (current->prev != NULL) {
+                current->prev->next = current->next;
+            } else {
+                // Jika node adalah head
+                daftar->head = current->next;
+            }
+
+            if (current->next != NULL) {
+                current->next->prev = current->prev;
+            } else {
+                // Jika node adalah tail
+                daftar->tail = current->prev;
+            }
+
+            free(current);
+            daftar->count--;
+            printf("Kelas '%s' berhasil dihapus.\n", namaKelas);
+            return;
+        }
+        current = current->next;
+    }
+
+    printf("Kelas '%s' tidak ditemukan.\n", namaKelas);
+}
 
 // Fungsi Aktifitas 
 
