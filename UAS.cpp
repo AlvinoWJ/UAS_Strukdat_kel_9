@@ -11,6 +11,10 @@ typedef struct NodeKelas
     struct NodeKelas *next;
 } NodeKelas;
 
+// Fungsi untuk memvalidasi nama kelas yang unik
+
+// Fungsi untuk mengedit nama kelas
+
 // Struktur untuk Stack Aktivitas
 
 // Struktur untuk Queue Belajar (Queue)
