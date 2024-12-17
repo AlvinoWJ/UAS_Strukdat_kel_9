@@ -12,8 +12,35 @@ typedef struct NodeKelas
 } NodeKelas;
 
 // Fungsi untuk memvalidasi nama kelas yang unik
+int isNamaKelasUnik(DaftarKelas *daftar, char *namakelas) {
+    NodeKelas *current = daftar->head;
+    while (current != NULL) {
+        if (strcmp(current->namaKelas, namaKelas) == 0) {
+            return 0; // Untuk nama kelas tidak unik
+        }
+        current = current->next;
+    }
+    return 1; // Untuk nama kelas jika unik
+}
 
 // Fungsi untuk mengedit nama kelas
+void editKelas(DaftarKelas *daftar, char *namaKelasLama, char *namaKelasBaru) {
+    NodeKelas *current = daftar->head;
+    while (current != NULL) {
+        if (strcmp(current->namaKelas, namaKelaslama) == 0) {
+            if (isNamaKelasUnik(daftar, namaKelasBaru)) {
+                strcpy(current->namaKelas, namaKelasBaru);
+                printf("Nama kelas berhasil diubah dari '%s' menjadi '%s'.\n", namaKelasLama, namaKelasBaru);
+            } else {
+                printf("Nama kelas baru '%s' sudah ada. Silahkan pilih nama lain. \n", namaKelasBaru);
+            }
+            return;
+        }
+        current = current->next;
+    }
+    current = current->next;
+}
+printf("Nama kelas '%s' tidak ditemukan.\n", namaKelasLama);
 
 // Struktur untuk Stack Aktivitas
 
@@ -46,8 +73,9 @@ void menuKelas(DaftarKelas *daftar)
         printf("\n--- Menu Kelas ---\n");
         printf("1. Tambah Kelas\n");
         printf("2. Hapus Kelas\n");
-        printf("3. Kembali ke Menu Utama\n");
-        printf("Pilih menu (1-3): ");
+        printf("3. Edit Kelas\n");
+        printf("4. Kembali ke Menu Utama\n");
+        printf("Pilih menu (1-4): ");
         scanf("%d", &pilihan);
         getchar(); // Membersihkan newline
 
@@ -59,7 +87,18 @@ void menuKelas(DaftarKelas *daftar)
         case 2:
             hapusKelas(daftar);
             break;
-        case 3:
+        case 3: {
+            char namaKelasLama[50], namaKelasBaru[50];
+            printf("Masukan nama kelas yang akan diubah: ");
+            fgets(namaKelasLama, sizeof(namaKelasLama), stdin);
+            namaKelasLama[strcspn(namaKelasLama, "\n")] = '\0';
+            printf("Masukan nama kelas baru: ");
+            fgets(namaKelasBaru, sizeof(namaKelasBaru), stdin);
+            namaKelasBaru[strcspn(namaKelasBaru, "\n")] = '\0';
+            editKelas(daftar, namaKelasLama, namaKelasBaru);
+            break;
+        }
+        case 4:
             printf("Kembali ke Menu Utama.\n");
             break;
         default:
@@ -125,6 +164,11 @@ void tambahKelas(DaftarKelas *daftar)
     fgets(namaKelas, sizeof(namaKelas), stdin);
     namaKelas[strcspn(namaKelas, "\n")] = '\0';
 
+    if (!isNamaKelasUnik(daftar, namaKelas)) {
+        printf("Nama kelas '%s' sudah ada. Pilih nama lain.\n", namaKelas);
+        return;
+    }
+
     NodeKelas *kelasBaruNode = (NodeKelas *)malloc(sizeof(NodeKelas));
     if (kelasBaruNode == NULL)
     {
@@ -172,6 +216,7 @@ void hapusKelas(DaftarKelas *daftar)
     while (current != NULL)
     {
         if (strcmp(current->namaKelas, namaKelas) == 0)
+            
         {
             // Hapus node yang ditemukan
             if (current->prev != NULL)
