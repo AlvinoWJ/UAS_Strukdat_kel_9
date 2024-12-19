@@ -437,3 +437,45 @@ void matericurrent(Que *q)
 }
 
 // Fungsi menu tugas
+typedef struct Tugas {
+    char nama[50];
+    struct Tugas *next;
+} Tugas;
+
+Tugas *headTugas = NULL;
+
+void tambahTugas(const char *nama) {
+    Tugas *tugasBaru = (Tugas *)malloc(sizeof(Tugas));
+    strcpy(tugasBaru->nama, nama);
+    tugasBaru->next = NULL;
+
+    if (headTugas == NULL)
+        headTugas = tugasBaru;
+    else {
+        Tugas *temp = headTugas;
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = tugasBaru;
+    }
+}
+
+void prosesTugas() {
+    if (headTugas == NULL) {
+        printf("Tidak ada tugas untuk diproses.\n");
+        return;
+    }
+    Tugas *temp = headTugas;
+    headTugas = headTugas->next;
+    printf("Tugas '%s' sedang diproses.\n", temp->nama);
+    free(temp);
+}
+
+void tampilkanTugas() {
+    Tugas *temp = headTugas;
+    printf("Antrian Tugas:\n");
+    while (temp != NULL) {
+        printf("%s\n", temp->nama);
+        temp = temp->next;
+    }
+}
+
