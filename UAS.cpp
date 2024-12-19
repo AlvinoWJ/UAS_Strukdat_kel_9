@@ -153,6 +153,41 @@ void menuAktivitas()
 }
 
 // menu antrian belajar (Queue)
+void queueMenu(Que *q) {
+    int pilihan;
+    do {
+        system("cls"); // Membersihkan layar sebelum menampilkan sub-menu
+        printf("Sub-Menu Queue:\n");
+        printf("1. Tambahkan Materi\n");
+        printf("2. Lihat Materi Saat Ini\n");
+        printf("3. Selesaikan Materi Saat Ini\n");
+        printf("4. Tampilkan Semua Materi\n");
+        printf("0. Kembali ke Menu Utama\n");
+        printf("Pilih: ");
+        scanf("%d", &pilihan);
+        getchar(); // Membersihkan buffer
+
+        system("cls"); // Membersihkan layar sebelum menampilkan hasil
+        if (pilihan == 1) {
+            enqueue(q);
+        } else if (pilihan == 2) {
+            matericurrent(q);
+        } else if (pilihan == 3) {
+            dequeue(q);
+        } else if (pilihan == 4) {
+            tampilkanAntrianBelajar(q);
+        } else if (pilihan == 0) {
+            printf("Kembali ke menu utama...\n");
+        } else {
+            printf("Pilihan tidak valid! Silakan coba lagi.\n");
+        }
+
+        if (pilihan != 0) {
+            printf("\nTekan Enter untuk melanjutkan...");
+            getchar();
+        }
+    } while (pilihan != 0);
+}
 
 // menu tugas
 
