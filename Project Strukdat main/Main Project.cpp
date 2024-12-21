@@ -178,6 +178,34 @@ void tampilkanLearningPath() {
         current = current->next;
     }
 }
+// Fungsi untuk mencatat aktivitas (Stack) [yazid]
+void pushAktivitas(const char *deskripsi) {
+    Aktivitas *aktivitasBaru = (Aktivitas *)malloc(sizeof(Aktivitas));
+    if (aktivitasBaru == NULL) {
+        printf("Gagal mengalokasikan memori.\n");
+        return;
+    }
+    
+    strncpy(aktivitasBaru->deskripsi, deskripsi, sizeof(aktivitasBaru->deskripsi) - 1);
+    aktivitasBaru->deskripsi[sizeof(aktivitasBaru->deskripsi) - 1] = '\0';
+    aktivitasBaru->next = top;
+    top = aktivitasBaru;
+}
+
+void lihatAktivitas() {
+    if (top == NULL) {
+        printf("Tidak ada riwayat aktivitas.\n");
+        return;
+    }
+    
+    printf("\n=== Riwayat Aktivitas ===\n");
+    Aktivitas* temp = top;
+    int i = 1;
+    while(temp != NULL) {
+        printf("%d. %s\n", i++, temp->deskripsi);
+        temp = temp->next;
+    }
+}
 
 // Fungsi untuk antrian belajar (Queue) [wardhana]
 void enqueue(Que *q, char *materi) {
