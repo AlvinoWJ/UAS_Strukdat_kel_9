@@ -37,6 +37,12 @@ typedef struct Ujian
     struct Ujian *next;
 } Ujian;
 
+// Variabel Global [cludia]
+Aktivitas *top = NULL;
+KelasNode* daftarLearningPath = NULL;
+Ujian* daftarUjian = NULL;
+
+
 // Inisialisasi Learning Path dengan Modul-modulnya [efandy]
 void inisialisasiLearningPath() {
     // Web Programming
@@ -335,4 +341,132 @@ void lihatHasilUjian()
         printf("   Nilai: %d\n", current->nilai);
         current = current->next;
     }
+}
+
+// Main Menu [claudia]
+void mainMenu() {
+    DaftarKelas kelasUser = {NULL, NULL, 0};
+    Que antrianBelajar = {NULL, NULL, 0};
+    char kelasSekarang[50] = "";
+    int pilihan;
+    
+    do {
+        printf("\n=== Learning Management System ===\n");
+        printf("1. Lihat Learning Path yang Tersedia\n");
+        printf("2. Daftar Kelas Baru\n");
+        printf("3. Lihat Kelas yang Diambil\n");
+        printf("4. Lihat Riwayat Aktivitas\n");
+        printf("5. Akses Materi Pembelajaran\n");
+        printf("6. Ikut Ujian\n");
+        printf("7. Lihat Hasil Ujian\n");
+        printf("8. Keluar\n");
+        printf("Pilihan Anda: ");
+        scanf("%d", &pilihan);
+        getchar();
+        
+        switch(pilihan) {
+            case 1:
+                tampilkanLearningPath();
+                break;
+                
+            case 2: {
+                tampilkanLearningPath();
+                char namaKelas[50];
+                printf("\nMasukkan nama kelas yang ingin diikuti: ");
+                fgets(namaKelas, sizeof(namaKelas), stdin);
+                namaKelas[strcspn(namaKelas, "\n")] = '\0';
+                
+                // Cek apakah kelas tersedia
+                KelasNode* kelas = daftarLearningPath;
+                int kelasValid = 0;
+                while(kelas != NULL) {
+                    if(strcmp(kelas->namaKelas, namaKelas) == 0) {
+                        kelasValid = 1;
+                        // Tambahkan ke daftar kelas user
+                        tambahKelas(&kelasUser, namaKelas);
+                        strcpy(kelasSekarang, namaKelas);
+                        
+                        // Tambahkan modul-modul ke antrian belajar
+                        Modul* modul = kelas->daftarModul;
+                        while(modul != NULL) {
+                            enqueue(&antrianBelajar, modul->namaModul);
+                            modul = modul->next;
+                        }
+                        
+                        // Catat aktivitas
+                        char aktivitas[100];
+                        sprintf(aktivitas, "Mendaftar ke kelas: %s", namaKelas);
+                        pushAktivitas(aktivitas);
+                        break;
+                    }
+                    kelas = kelas->next;
+                }
+                
+                if(!kelasValid) {
+                    printf("Kelas tidak ditemukan!\n");
+                }
+                break;
+            }
+                
+            case 3:
+                lihatDaftarKelas(&kelasUser);
+                break;
+                
+            case 4:
+                lihatAktivitas();
+                break;
+                
+            case 5:
+                if(kelasSekarang[0] == '\0') {
+                    printf("Anda belum mengambil kelas apapun.\n");
+                    break;
+                }
+                
+                if(antrianBelajar.frontQ != NULL) {
+                    printf("\nMateri yang sedang dipelajari: %s\n", antrianBelajar.frontQ->materi);
+                    printf("1. Selesai mempelajari\n");
+                    printf("2. Kembali\n");
+                    int pilihanMateri;
+                    scanf("%d", &pilihanMateri);
+                    if(pilihanMateri == 1) {
+                        dequeue(&antrianBelajar, &kelasUser, kelasSekarang);
+                    }
+                } else {
+                    printf("Selamat! Anda telah menyelesaikan semua materi di kelas ini.\n");
+                }
+                break;
+
+            case 6: {
+                if(kelasSekarang[0] == '\0') {
+                    printf("Anda belum mengambil kelas apapun.\n");
+                    break;
+                }
+                
+                if(antrianBelajar.frontQ != NULL) {
+                    printf("Anda belum menyelesaikan semua materi pada kelas ini.\n");
+                    break;
+                }
+                
+                ikutUjian(kelasSekarang);
+                break;
+            }
+                
+            case 7:
+                lihatHasilUjian();
+                break;
+                
+            case 8:
+                printf("Terima kasih telah menggunakan sistem ini.\n");
+                break;
+                
+            default:
+                printf("Pilihan tidak valid!\n");
+        }
+    } while(pilihan != 8);
+}
+
+int main() {
+    inisialisasiLearningPath();
+    mainMenu();
+    return 0;
 }
