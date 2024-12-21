@@ -17,6 +17,18 @@ typedef struct KelasNode {
     struct KelasNode* next;
 } KelasNode;
 
+// Struktur untuk (antrian) Queue Belajar [wardhana]
+typedef struct NodeQ {
+    char materi[50];
+    struct NodeQ *next;
+} NodeQ;
+
+typedef struct Que {
+    NodeQ *frontQ;
+    NodeQ *rearQ;
+    int count;
+} Que;
+
 // Struktur untuk Ujian [alvin0]
 typedef struct Ujian
 {
