@@ -17,6 +17,12 @@ typedef struct KelasNode {
     struct KelasNode* next;
 } KelasNode;
 
+// Struktur untuk Stack Aktivitas [yazid]
+typedef struct Aktivitas {
+    char deskripsi[100];
+    struct Aktivitas *next;
+} Aktivitas;
+
 // Struktur untuk (antrian) Queue Belajar [wardhana]
 typedef struct NodeQ {
     char materi[50];
