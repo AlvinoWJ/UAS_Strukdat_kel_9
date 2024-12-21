@@ -167,6 +167,56 @@ void tampilkanLearningPath() {
     }
 }
 
+// Fungsi untuk antrian belajar (Queue) [wardhana]
+void enqueue(Que *q, char *materi) {
+    NodeQ newNode = (NodeQ)malloc(sizeof(NodeQ));
+    strcpy(newNode->materi, materi);
+    newNode->next = NULL;
+    
+    if(q->rearQ == NULL) {
+        q->frontQ = q->rearQ = newNode;
+    } else {
+        q->rearQ->next = newNode;
+        q->rearQ = newNode;
+    }
+    q->count++;
+}
+
+void dequeue(Que *q, DaftarKelas *daftar, const char *namaKelas) {
+    if(q->frontQ == NULL) {
+        printf("Antrian belajar kosong.\n");
+        return;
+    }
+    
+    NodeQ *temp = q->frontQ;
+    printf("Selesai mempelajari: %s\n", temp->materi);
+    
+    // Update progress kelas
+    NodeKelas *kelas = daftar->head;
+    while(kelas != NULL) {
+        if(strcmp(kelas->namaKelas, namaKelas) == 0) {
+            int newProgress = kelas->progress + 25; // Setiap modul bernilai 25%
+            if(newProgress > 100) newProgress = 100;
+            updateProgress(daftar, namaKelas, newProgress);
+            break;
+        }
+        kelas = kelas->next;
+    }
+    
+    q->frontQ = q->frontQ->next;
+    if(q->frontQ == NULL) {
+        q->rearQ = NULL;
+    }
+    
+    free(temp);
+    q->count--;
+    
+    // Catat aktivitas
+    char aktivitas[100];
+    sprintf(aktivitas, "Menyelesaikan modul: %s", temp->materi);
+    pushAktivitas(aktivitas);
+}
+
 // fungsi fitur ujian [alvin]
 int isKelasSelesai(const char *namaKelas)
 {
