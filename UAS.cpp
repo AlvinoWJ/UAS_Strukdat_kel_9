@@ -11,38 +11,13 @@ typedef struct NodeKelas
     struct NodeKelas *next;
 } NodeKelas;
 
-// Fungsi untuk memvalidasi nama kelas yang unik
-int isNamaKelasUnik(DaftarKelas *daftar, char *namakelas) {
-    NodeKelas *current = daftar->head;
-    while (current != NULL) {
-        if (strcmp(current->namaKelas, namaKelas) == 0) {
-            return 0; // Untuk nama kelas tidak unik
-        }
-        current = current->next;
-    }
-    return 1; // Untuk nama kelas jika unik
-}
-
-// Fungsi untuk mengedit nama kelas
-void editKelas(DaftarKelas *daftar, char *namaKelasLama, char *namaKelasBaru) {
-    NodeKelas *current = daftar->head;
-    while (current != NULL) {
-        if (strcmp(current->namaKelas, namaKelaslama) == 0) {
-            if (isNamaKelasUnik(daftar, namaKelasBaru)) {
-                strcpy(current->namaKelas, namaKelasBaru);
-                printf("Nama kelas berhasil diubah dari '%s' menjadi '%s'.\n", namaKelasLama, namaKelasBaru);
-            } else {
-                printf("Nama kelas baru '%s' sudah ada. Silahkan pilih nama lain. \n", namaKelasBaru);
-            }
-            return;
-        }
-        current = current->next;
-    }
-    current = current->next;
-}
-printf("Nama kelas '%s' tidak ditemukan.\n", namaKelasLama);
-
 // Struktur untuk Stack Aktivitas
+
+typedef struct Aktivitas
+{
+    char deskripsi[100];
+    struct Aktivitas *next;
+} Aktivitas;
 
 // Struktur untuk Queue Belajar (Queue)
 typedef struct NodeQ
@@ -60,7 +35,14 @@ typedef struct Que
 
 // Struktur untuk Tugas (Single Linked List)
 
+typedef struct Tugas {
+    char nama[50];
+    struct Tugas *next;
+} Tugas;
+
 // Variabel Global
+Aktivitas *top = NULL;
+Tugas *headTugas = NULL;
 
 // menu utama
 
@@ -284,15 +266,38 @@ void hapusKelas(DaftarKelas *daftar)
 
     printf("Kelas '%s' tidak ditemukan.\n", namaKelas);
 }
+// Fungsi untuk memvalidasi nama kelas yang unik
+int isNamaKelasUnik(DaftarKelas *daftar, char *namakelas) {
+    NodeKelas *current = daftar->head;
+    while (current != NULL) {
+        if (strcmp(current->namaKelas, namaKelas) == 0) {
+            return 0; // Untuk nama kelas tidak unik
+        }
+        current = current->next;
+    }
+    return 1; // Untuk nama kelas jika unik
+}
+
+// Fungsi untuk mengedit nama kelas
+void editKelas(DaftarKelas *daftar, char *namaKelasLama, char *namaKelasBaru) {
+    NodeKelas *current = daftar->head;
+    while (current != NULL) {
+        if (strcmp(current->namaKelas, namaKelaslama) == 0) {
+            if (isNamaKelasUnik(daftar, namaKelasBaru)) {
+                strcpy(current->namaKelas, namaKelasBaru);
+                printf("Nama kelas berhasil diubah dari '%s' menjadi '%s'.\n", namaKelasLama, namaKelasBaru);
+            } else {
+                printf("Nama kelas baru '%s' sudah ada. Silahkan pilih nama lain. \n", namaKelasBaru);
+            }
+            return;
+        }
+        current = current->next;
+    }
+    current = current->next;
+}
+printf("Nama kelas '%s' tidak ditemukan.\n", namaKelasLama);
 
 // Fungsi Aktifitas
-typedef struct Aktivitas
-{
-    char deskripsi[100];
-    struct Aktivitas *next;
-} Aktivitas;
-
-Aktivitas *top = NULL;
 
 void pushAktivitas(const char *deskripsi)
 {
@@ -437,13 +442,6 @@ void matericurrent(Que *q)
 }
 
 // Fungsi menu tugas
-typedef struct Tugas {
-    char nama[50];
-    struct Tugas *next;
-} Tugas;
-
-Tugas *headTugas = NULL;
-
 void tambahTugas(const char *nama) {
     Tugas *tugasBaru = (Tugas *)malloc(sizeof(Tugas));
     strcpy(tugasBaru->nama, nama);
