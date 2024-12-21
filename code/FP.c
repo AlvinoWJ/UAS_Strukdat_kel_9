@@ -3,21 +3,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Struktur untuk Modul Pembelajaran
+// Struktur untuk Modul Pembelajaran [efandy]
 typedef struct Modul {
     char namaModul[100];
     int selesai; // Flag untuk menandai modul yang sudah selesai
     struct Modul* next;
 } Modul;
 
-// Struktur untuk Kelas (Learning Path)
+// Struktur untuk Kelas (Learning Path) [efandy]
 typedef struct KelasNode {
     char namaKelas[50];
     Modul* daftarModul;
     struct KelasNode* next;
 } KelasNode;
 
-// Struktur untuk Daftar Kelas yang Diambil User (Double Linked List)
+// Struktur untuk Daftar Kelas yang Diambil User (Double Linked List) [rafif]
 typedef struct NodeKelas {
     char namaKelas[50];
     int progress; // Persentase progress (0-100)
@@ -31,13 +31,13 @@ typedef struct DaftarKelas {
     int count;
 } DaftarKelas;
 
-// Struktur untuk Stack Aktivitas
+// Struktur untuk Stack Aktivitas [yazid]
 typedef struct Aktivitas {
     char deskripsi[100];
     struct Aktivitas *next;
 } Aktivitas;
 
-// Struktur untuk Queue Belajar
+// Struktur untuk (antrian) Queue Belajar [wardana]
 typedef struct NodeQ {
     char materi[50];
     struct NodeQ *next;
@@ -49,19 +49,19 @@ typedef struct Que {
     int count;
 } Que;
 
-// Struktur untuk Ujian
+// Struktur untuk Ujian [alvin]
 typedef struct Ujian {
     char namaUjian[50];
     int nilai;
     struct Ujian* next;
 } Ujian;
 
-// Variabel Global
+// Variabel Global [cludia]
 Aktivitas *top = NULL;
 KelasNode* daftarLearningPath = NULL;
 Ujian* daftarUjian = NULL;
 
-// Fungsi untuk DaftarKelas
+// Fungsi untuk DaftarKelas [rafif]
 void tambahKelas(DaftarKelas *daftar, const char *namaKelas) {
     NodeKelas *newNode = (NodeKelas*)malloc(sizeof(NodeKelas));
     strcpy(newNode->namaKelas, namaKelas);
@@ -108,7 +108,7 @@ void lihatDaftarKelas(DaftarKelas *daftar) {
     }
 }
 
-// Inisialisasi Learning Path dengan Modul-modulnya
+// Inisialisasi Learning Path dengan Modul-modulnya [efandy]
 void inisialisasiLearningPath() {
     // Web Programming
     KelasNode* webProg = (KelasNode*)malloc(sizeof(KelasNode));
@@ -238,7 +238,7 @@ void tampilkanLearningPath() {
     }
 }
 
-// Fungsi untuk mencatat aktivitas (Stack)
+// Fungsi untuk mencatat aktivitas (Stack) [yazid]
 void pushAktivitas(const char *deskripsi) {
     Aktivitas *aktivitasBaru = (Aktivitas *)malloc(sizeof(Aktivitas));
     if (aktivitasBaru == NULL) {
@@ -267,7 +267,7 @@ void lihatAktivitas() {
     }
 }
 
-// Fungsi untuk antrian belajar (Queue)
+// Fungsi untuk antrian belajar (Queue) [wardana]
 void enqueue(Que *q, char *materi) {
     NodeQ *newNode = (NodeQ*)malloc(sizeof(NodeQ));
     strcpy(newNode->materi, materi);
@@ -316,7 +316,8 @@ void dequeue(Que *q, DaftarKelas *daftar, const char *namaKelas) {
     sprintf(aktivitas, "Menyelesaikan modul: %s", temp->materi);
     pushAktivitas(aktivitas);
 }
-// Function to check if all modules in a class are completed
+
+// fungsi fitur ujian [alvin]
 int isKelasSelesai(const char *namaKelas) {
     KelasNode* current = daftarLearningPath;
     while(current != NULL) {
@@ -335,7 +336,6 @@ int isKelasSelesai(const char *namaKelas) {
     return 0; // Class not found
 }
 
-// Function to add a new exam
 void tambahUjian(const char *namaKelas) {
     Ujian* newUjian = (Ujian*)malloc(sizeof(Ujian));
     if(newUjian == NULL) {
@@ -358,7 +358,6 @@ void tambahUjian(const char *namaKelas) {
     }
 }
 
-// Function to take an exam
 void ikutUjian(const char *namaKelas) {
     if(!isKelasSelesai(namaKelas)) {
         printf("Anda belum menyelesaikan semua modul pada kelas %s.\n", namaKelas);
@@ -402,7 +401,6 @@ void ikutUjian(const char *namaKelas) {
     pushAktivitas(aktivitas);
 }
 
-// Function to view exam results
 void lihatHasilUjian() {
     if(daftarUjian == NULL) {
         printf("Belum ada ujian yang diikuti.\n");
@@ -419,7 +417,7 @@ void lihatHasilUjian() {
     }
 }
 
-// Main Menu
+// Main Menu [claudia]
 void mainMenu() {
     DaftarKelas kelasUser = {NULL, NULL, 0};
     Que antrianBelajar = {NULL, NULL, 0};
