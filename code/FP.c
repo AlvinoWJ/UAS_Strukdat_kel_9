@@ -316,6 +316,108 @@ void dequeue(Que *q, DaftarKelas *daftar, const char *namaKelas) {
     sprintf(aktivitas, "Menyelesaikan modul: %s", temp->materi);
     pushAktivitas(aktivitas);
 }
+// Function to check if all modules in a class are completed
+int isKelasSelesai(const char *namaKelas) {
+    KelasNode* current = daftarLearningPath;
+    while(current != NULL) {
+        if(strcmp(current->namaKelas, namaKelas) == 0) {
+            Modul* currentModul = current->daftarModul;
+            while(currentModul != NULL) {
+                if(!currentModul->selesai) {
+                    return 0; // Not all modules are completed
+                }
+                currentModul = currentModul->next;
+            }
+            return 1; // All modules are completed
+        }
+        current = current->next;
+    }
+    return 0; // Class not found
+}
+
+// Function to add a new exam
+void tambahUjian(const char *namaKelas) {
+    Ujian* newUjian = (Ujian*)malloc(sizeof(Ujian));
+    if(newUjian == NULL) {
+        printf("Gagal mengalokasikan memori untuk ujian.\n");
+        return;
+    }
+    
+    sprintf(newUjian->namaUjian, "Ujian %s", namaKelas);
+    newUjian->nilai = 0;
+    newUjian->next = NULL;
+    
+    if(daftarUjian == NULL) {
+        daftarUjian = newUjian;
+    } else {
+        Ujian* current = daftarUjian;
+        while(current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newUjian;
+    }
+}
+
+// Function to take an exam
+void ikutUjian(const char *namaKelas) {
+    if(!isKelasSelesai(namaKelas)) {
+        printf("Anda belum menyelesaikan semua modul pada kelas %s.\n", namaKelas);
+        return;
+    }
+    
+    // Simulate an exam with random questions
+    printf("\n=== Ujian Kelas %s ===\n", namaKelas);
+    int totalPertanyaan = 5;
+    int jawabanBenar = 0;
+    
+    for(int i = 1; i <= totalPertanyaan; i++) {
+        int jawaban;
+        printf("\nPertanyaan %d:\n", i);
+        printf("Berapa hasil dari %d + %d?\n", i*2, i*3);
+        printf("Jawaban Anda: ");
+        scanf("%d", &jawaban);
+        
+        if(jawaban == i*2 + i*3) {
+            jawabanBenar++;
+        }
+    }
+    
+    // Calculate and save the score
+    int nilai = (jawabanBenar * 100) / totalPertanyaan;
+    
+    Ujian* current = daftarUjian;
+    while(current != NULL) {
+        if(strstr(current->namaUjian, namaKelas) != NULL) {
+            current->nilai = nilai;
+            break;
+        }
+        current = current->next;
+    }
+    
+    printf("\nNilai Ujian: %d\n", nilai);
+    
+    // Record the activity
+    char aktivitas[100];
+    sprintf(aktivitas, "Mengikuti ujian %s dengan nilai %d", namaKelas, nilai);
+    pushAktivitas(aktivitas);
+}
+
+// Function to view exam results
+void lihatHasilUjian() {
+    if(daftarUjian == NULL) {
+        printf("Belum ada ujian yang diikuti.\n");
+        return;
+    }
+    
+    printf("\n=== Hasil Ujian ===\n");
+    Ujian* current = daftarUjian;
+    int no = 1;
+    while(current != NULL) {
+        printf("%d. %s\n", no++, current->namaUjian);
+        printf("   Nilai: %d\n", current->nilai);
+        current = current->next;
+    }
+}
 
 // Main Menu
 void mainMenu() {
@@ -331,7 +433,9 @@ void mainMenu() {
         printf("3. Lihat Kelas yang Diambil\n");
         printf("4. Lihat Riwayat Aktivitas\n");
         printf("5. Akses Materi Pembelajaran\n");
-        printf("6. Keluar\n");
+        printf("6. Ikut Ujian\n");
+        printf("7. Lihat Hasil Ujian\n");
+        printf("8. Keluar\n");
         printf("Pilihan Anda: ");
         scanf("%d", &pilihan);
         getchar();
@@ -407,15 +511,34 @@ void mainMenu() {
                     printf("Selamat! Anda telah menyelesaikan semua materi di kelas ini.\n");
                 }
                 break;
+
+            case 6: {
+                if(kelasSekarang[0] == '\0') {
+                    printf("Anda belum mengambil kelas apapun.\n");
+                    break;
+                }
                 
-            case 6:
+                if(antrianBelajar.frontQ != NULL) {
+                    printf("Anda belum menyelesaikan semua materi pada kelas ini.\n");
+                    break;
+                }
+                
+                ikutUjian(kelasSekarang);
+                break;
+            }
+                
+            case 7:
+                lihatHasilUjian();
+                break;
+                
+            case 8:
                 printf("Terima kasih telah menggunakan sistem ini.\n");
                 break;
                 
             default:
                 printf("Pilihan tidak valid!\n");
         }
-    } while(pilihan != 6);
+    } while(pilihan != 8);
 }
 
 int main() {
