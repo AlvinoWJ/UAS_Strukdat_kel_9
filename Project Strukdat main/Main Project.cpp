@@ -62,6 +62,53 @@ Aktivitas *top = NULL;
 KelasNode* daftarLearningPath = NULL;
 Ujian* daftarUjian = NULL;
 
+// Fungsi untuk DaftarKelas [rafif]
+void tambahKelas(DaftarKelas *daftar, const char *namaKelas) {
+    NodeKelas *newNode = (NodeKelas*)malloc(sizeof(NodeKelas));
+    strcpy(newNode->namaKelas, namaKelas);
+    newNode->progress = 0;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+
+    if (daftar->head == NULL) {
+        daftar->head = daftar->tail = newNode;
+    } else {
+        newNode->prev = daftar->tail;
+        daftar->tail->next = newNode;
+        daftar->tail = newNode;
+    }
+    daftar->count++;
+    printf("Kelas %s berhasil ditambahkan ke daftar kelas Anda.\n", namaKelas);
+}
+
+void updateProgress(DaftarKelas *daftar, const char *namaKelas, int newProgress) {
+    NodeKelas *current = daftar->head;
+    while (current != NULL) {
+        if (strcmp(current->namaKelas, namaKelas) == 0) {
+            current->progress = newProgress;
+            printf("Progress kelas %s diperbarui menjadi %d%%\n", namaKelas, newProgress);
+            return;
+        }
+        current = current->next;
+    }
+    printf("Kelas %s tidak ditemukan dalam daftar kelas Anda.\n", namaKelas);
+}
+
+void lihatDaftarKelas(DaftarKelas *daftar) {
+    if (daftar->head == NULL) {
+        printf("Anda belum mengambil kelas apapun.\n");
+        return;
+    }
+
+    printf("\n=== Daftar Kelas yang Diambil ===\n");
+    NodeKelas *current = daftar->head;
+    int no = 1;
+    while (current != NULL) {
+        printf("%d. %s (Progress: %d%%)\n", no++, current->namaKelas, current->progress);
+        current = current->next;
+    }
+}
+
 
 // Inisialisasi Learning Path dengan Modul-modulnya [efandy]
 void inisialisasiLearningPath() {
