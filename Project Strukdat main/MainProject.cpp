@@ -58,6 +58,69 @@ typedef struct Ujian
     struct Ujian *next;
 } Ujian;
 
+typedef struct Soal {
+    char pertanyaan[200];
+    char pilihan[4][100];
+    int jawabanBenar;
+} Soal;
+
+// Bank soal untuk setiap kelas
+Soal soalWebProgramming[] = {
+    {
+        "Apa kepanjangan dari HTML?",
+        {"HyperText Markup Language", "HighText Modern Language", "HyperText Modern Link", "HighText Markup Link"},
+        0
+    },
+    {
+        "Properti CSS yang digunakan untuk mengatur jarak antara elemen adalah?",
+        {"spacing", "margin", "padding", "border"},
+        1
+    },
+    {
+        "Fungsi JavaScript yang digunakan untuk menampilkan dialog konfirmasi adalah?",
+        {"alert()", "prompt()", "confirm()", "message()"},
+        2
+    },
+    {
+        "Framework JavaScript yang populer untuk pengembangan frontend adalah?",
+        {"Django", "Flask", "Laravel", "React"},
+        3
+    },
+    {
+        "Metode HTTP yang digunakan untuk mengirim data form adalah?",
+        {"POST", "GET", "PUT", "DELETE"},
+        0
+    }
+};
+
+Soal soalMobileDevelopment[] = {
+    {
+        "Bahasa pemrograman utama untuk pengembangan Android native adalah?",
+        {"Swift", "Kotlin", "JavaScript", "Python"},
+        1
+    },
+    {
+        "Framework cross-platform untuk pengembangan mobile adalah?",
+        {"Angular", "Vue", "React Native", "Laravel"},
+        2
+    },
+    {
+        "Tool untuk mendesain UI/UX mobile app adalah?",
+        {"Figma", "WordPress", "Visual Studio", "NetBeans"},
+        0
+    },
+    {
+        "Database yang sering digunakan dalam pengembangan mobile adalah?",
+        {"MongoDB", "SQLite", "Redis", "Cassandra"},
+        1
+    },
+    {
+        "Komponen Android yang berfungsi sebagai layar/halaman adalah?",
+        {"Service", "Activity", "Content Provider", "Broadcast Receiver"},
+        1
+    }
+};
+
 // Variabel Global [cludia]
 Aktivitas *top = NULL;
 KelasNode* daftarLearningPath = NULL;
@@ -73,7 +136,7 @@ void pushAktivitas(const char *deskripsi);
 void lihatAktivitas();
 void enqueue(Que *q, char *materi);
 void dequeue(Que *q, DaftarKelas *daftar, const char *namaKelas);
-int isKelasSelesai(const char *namaKelas);
+int isKelasSelesai(const char *namaKelas, DaftarKelas *daftar);
 void tambahUjian(const char *namaKelas);
 void ikutUjian(const char *namaKelas);
 void lihatHasilUjian();
@@ -604,23 +667,14 @@ void dequeue(Que *q, DaftarKelas *daftar, const char *namaKelas) {
 }
 
 // fungsi fitur ujian [alvin]
-int isKelasSelesai(const char *namaKelas)
+int isKelasSelesai(const char *namaKelas, DaftarKelas *daftar)
 {
-    KelasNode *current = daftarLearningPath;
+    NodeKelas *current = daftar->head;
     while (current != NULL)
     {
         if (strcmp(current->namaKelas, namaKelas) == 0)
         {
-            Modul *currentModul = current->daftarModul;
-            while (currentModul != NULL)
-            {
-                if (!currentModul->selesai)
-                {
-                    return 0; // Not all modules are completed
-                }
-                currentModul = currentModul->next;
-            }
-            return 1; // All modules are completed
+            return (current->progress == 100);   
         }
         current = current->next;
     }
@@ -629,6 +683,16 @@ int isKelasSelesai(const char *namaKelas)
 
 void tambahUjian(const char *namaKelas)
 {
+    // Cek apakah ujian untuk kelas ini sudah ada
+    Ujian *current = daftarUjian;
+    while (current != NULL) {
+        if (strstr(current->namaUjian, namaKelas) != NULL) {
+            // Ujian sudah ada, tidak perlu menambahkan lagi
+            return;
+        }
+        current = current->next;
+    }
+
     Ujian *newUjian = (Ujian *)malloc(sizeof(Ujian));
     if (newUjian == NULL)
     {
@@ -646,7 +710,7 @@ void tambahUjian(const char *namaKelas)
     }
     else
     {
-        Ujian *current = daftarUjian;
+        current = daftarUjian;
         while (current->next != NULL)
         {
             current = current->next;
@@ -657,33 +721,53 @@ void tambahUjian(const char *namaKelas)
 
 void ikutUjian(const char *namaKelas)
 {
-    if (!isKelasSelesai(namaKelas))
-    {
-        printf("Anda belum menyelesaikan semua modul pada kelas %s.\n", namaKelas);
+    // Cek apakah ujian sudah ada, jika belum, tambahkan
+    tambahUjian(namaKelas);
+    system("cls");
+    printf("\n=== Ujian %s ===\n", namaKelas);
+
+    // Pilih bank soal berdasarkan kelas
+    Soal *bankSoal;
+    int jumlahSoal = 5;
+
+
+        if (strcmp(namaKelas, "Web Programming") == 0) {
+        bankSoal = soalWebProgramming;
+    } else if (strcmp(namaKelas, "Mobile Development") == 0) {
+        bankSoal = soalMobileDevelopment;
+    } else {
+        printf("Kelas tidak valid\n");
         return;
     }
 
-    // Simulate an exam with random questions
-    printf("\n=== Ujian Kelas %s ===\n", namaKelas);
-    int totalPertanyaan = 5;
     int jawabanBenar = 0;
 
-    for (int i = 1; i <= totalPertanyaan; i++)
-    {
-        int jawaban;
-        printf("\nPertanyaan %d:\n", i);
-        printf("Berapa hasil dari %d + %d?\n", i * 2, i * 3);
-        printf("Jawaban Anda: ");
-        scanf("%d", &jawaban);
+    // Tampilkan soal
+    for (int i = 0; i < jumlahSoal; i++) {
+        printf("\nSoal %d:\n", i + 1);
+        printf("%s\n", bankSoal[i].pertanyaan);
+        
+        for (int j = 0; j < 4; j++) {
+            printf("%d. %s\n", j + 1, bankSoal[i].pilihan[j]);
+        }
 
-        if (jawaban == i * 2 + i * 3)
-        {
+        int jawaban;
+        do {
+            printf("Masukkan jawaban (1-4): ");
+            scanf("%d", &jawaban);
+            getchar(); // Bersihkan buffer
+            
+            if (jawaban < 1 || jawaban > 4) {
+                printf("Jawaban tidak valid. Silakan masukkan angka 1-4.\n");
+            }
+        } while (jawaban < 1 || jawaban > 4);
+
+        if (jawaban - 1 == bankSoal[i].jawabanBenar) {
             jawabanBenar++;
         }
     }
-
-    // Calculate and save the score
-    int nilai = (jawabanBenar * 100) / totalPertanyaan;
+    // Menghitung nilai
+    int nilai = (jawabanBenar * 100) / jumlahSoal;
 
     Ujian *current = daftarUjian;
     while (current != NULL)
@@ -696,7 +780,10 @@ void ikutUjian(const char *namaKelas)
         current = current->next;
     }
 
-    printf("\nNilai Ujian: %d\n", nilai);
+    printf("\n=== Hasil Ujian ===\n");
+    printf("Jawaban benar: %d dari %d soal\n", jawabanBenar, jumlahSoal);
+    printf("Nilai akhir: %d\n", nilai);
+    printf("Status: %s\n", (nilai >= 70) ? "LULUS" : "TIDAK LULUS");
 
     // Record the activity
     char aktivitas[100];
@@ -719,6 +806,20 @@ void lihatHasilUjian()
     {
         printf("%d. %s\n", no++, current->namaUjian);
         printf("   Nilai: %d\n", current->nilai);
+        printf("   Status\t: %s\n", (current->nilai >= 70) ? "LULUS" : "TIDAK LULUS");
+        printf("   Keterangan\t: ");
+
+        if (current->nilai >= 90) {
+            printf("Sangat Baik");
+        } else if (current->nilai >= 80) {
+            printf("Baik");
+        } else if (current->nilai >= 70) {
+            printf("Cukup");
+        } else {
+            printf("Perlu Perbaikan");
+        }
+        printf("\n");
+        
         current = current->next;
     }
 }
