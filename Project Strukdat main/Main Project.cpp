@@ -17,6 +17,20 @@ typedef struct KelasNode {
     struct KelasNode* next;
 } KelasNode;
 
+// Struktur untuk Daftar Kelas yang Diambil User (Double Linked List) [rafif]
+typedef struct NodeKelas {
+    char namaKelas[50];
+    int progress; // Persentase progress (0-100)
+    struct NodeKelas *prev;
+    struct NodeKelas *next;
+} NodeKelas;
+
+typedef struct DaftarKelas {
+    NodeKelas *head;
+    NodeKelas *tail;
+    int count;
+} DaftarKelas;
+
 // Struktur untuk Stack Aktivitas [yazid]
 typedef struct Aktivitas {
     char deskripsi[100];
