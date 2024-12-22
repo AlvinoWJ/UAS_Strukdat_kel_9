@@ -236,22 +236,62 @@ void mainMenu() {
                 aksesMateriPembelajaran(&kelasUser, &antrianBelajar, kelasSekarang);
                 break;
             case 6: {
-                if(kelasSekarang[0] == '\0') {
+                if(kelasUser.head == NULL) {
                     printf("Anda belum mengambil kelas apapun.\n");
+                    printf("\nTekan Enter untuk kembali ke menu...");
+                    getchar();
                     break;
                 }
-                
-                if(antrianBelajar.frontQ != NULL) {
-                    printf("Anda belum menyelesaikan semua materi pada kelas ini.\n");
+
+                printf("\n=== Pilih Kelas untuk Ujian ===\n");
+                NodeKelas *current = kelasUser.head;
+                int no = 1;
+                // Tampilkan hanya kelas dengan progress 100%
+                while(current != NULL) {
+                    printf("%d. %s (Progress: %d%%)", no++, current->namaKelas, current->progress);
+                    if(current->progress == 100) {
+                        printf(" [SIAP UJIAN]");
+                    }
+                    printf("\n");
+                    current = current->next;
+                }
+
+                int pilihanKelas;
+                printf("\nPilih nomor kelas (0 untuk kembali): ");
+                scanf("%d", &pilihanKelas);
+                getchar();
+
+                if(pilihanKelas == 0) {
                     break;
                 }
+
+                if(pilihanKelas < 1 || pilihanKelas > kelasUser.count) {
+                    printf("Pilihan kelas tidak valid!\n");
+                    printf("\nTekan Enter untuk kembali ke menu...");
+                    getchar();
+                    break;
+                }
+
+                // Dapatkan kelas yang dipilih
+                current = kelasUser.head;
+                for(int i = 1; i < pilihanKelas; i++) {
+                    current = current->next;
+                }
+
+                // Cek progress kelas
+                if(current->progress < 100) {
+                    printf("\nAnda belum menyelesaikan semua materi pada kelas %s.\n", current->namaKelas);
+                    printf("Progress saat ini: %d%%\n", current->progress);
+                    printf("Selesaikan semua materi terlebih dahulu untuk mengikuti ujian.\n");
+                } else {
+                    printf("\nMemulai Ujian untuk kelas %s...\n", current->namaKelas);
+                    ikutUjian(current->namaKelas);
+                }
                 
-                ikutUjian(kelasSekarang);
                 printf("\nTekan Enter untuk kembali ke menu...");
                 getchar();
                 break;
             }
-                
             case 7:
                 lihatHasilUjian();
                 printf("\nTekan Enter untuk kembali ke menu...");
@@ -819,7 +859,7 @@ void lihatHasilUjian()
             printf("Perlu Perbaikan");
         }
         printf("\n");
-        
+
         current = current->next;
     }
 }
