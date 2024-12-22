@@ -77,6 +77,7 @@ int isKelasSelesai(const char *namaKelas);
 void tambahUjian(const char *namaKelas);
 void ikutUjian(const char *namaKelas);
 void lihatHasilUjian();
+void aksesMateriPembelajaran(DaftarKelas *kelasUser, Que *antrianBelajar, char *kelasSekarang);
 void mainMenu();
 
 //fungsi utama
@@ -169,66 +170,8 @@ void mainMenu() {
                 break;
                 
             case 5:
-                if(kelasUser.head == NULL) {
-			        printf("Anda belum mengambil kelas apapun.\n");
-			        printf("\nTekan Enter untuk kembali ke menu...");
-			        getchar();
-			        break;
-			    }
-			    
-			    // Jika hanya ada satu kelas
-			    if(kelasUser.count == 1) {
-			        strcpy(kelasSekarang, kelasUser.head->namaKelas);
-			    } 
-			    // Jika ada lebih dari satu kelas
-			    else {
-			        printf("\n=== Pilih Kelas ===\n");
-			        NodeKelas *current = kelasUser.head;
-			        int no = 1;
-			        while(current != NULL) {
-			            printf("%d. %s (Progress: %d%%)\n", no++, current->namaKelas, current->progress);
-			            current = current->next;
-			        }
-			        
-			        int pilihanKelas;
-			        printf("\nPilih nomor kelas: ");
-			        scanf("%d", &pilihanKelas);
-			        getchar();
-			        
-			        // Validasi pilihan dan set kelasSekarang
-			        if(pilihanKelas >= 1 && pilihanKelas <= kelasUser.count) {
-			            current = kelasUser.head;
-			            for(int i = 1; i < pilihanKelas; i++) {
-			                current = current->next;
-			            }
-			            strcpy(kelasSekarang, current->namaKelas);
-			        } else {
-			            printf("Pilihan kelas tidak valid!\n");
-			            printf("\nTekan Enter untuk kembali ke menu...");
-			            getchar();
-			            break;
-			        }
-			    }
-			    
-			    // Menampilkan dan mengakses materi
-			    if(antrianBelajar.frontQ != NULL) {
-			        printf("\nMateri yang sedang dipelajari: %s\n", antrianBelajar.frontQ->materi);
-			        printf("1. Selesai mempelajari\n");
-			        printf("2. Kembali\n");
-			        printf("Pilihan Anda: ");
-			        int pilihanMateri;
-			        scanf("%d", &pilihanMateri);
-			        getchar();
-			        if(pilihanMateri == 1) {
-			            dequeue(&antrianBelajar, &kelasUser, kelasSekarang);
-			        }
-			    } else {
-			        printf("Selamat! Anda telah menyelesaikan semua materi di kelas ini.\n");
-			    }
-			    printf("\nTekan Enter untuk kembali ke menu...");
-			    getchar();
-			    break;
-
+                aksesMateriPembelajaran(&kelasUser, &antrianBelajar, kelasSekarang);
+                break;
             case 6: {
                 if(kelasSekarang[0] == '\0') {
                     printf("Anda belum mengambil kelas apapun.\n");
@@ -264,7 +207,145 @@ void mainMenu() {
     } while(pilihan != 8);
 }
 
+void aksesMateriPembelajaran(DaftarKelas *kelasUser, Que *antrianBelajar, char *kelasSekarang) {
+    if(kelasUser->head == NULL) {
+        printf("Anda belum mengambil kelas apapun.\n");
+        printf("\nTekan Enter untuk kembali ke menu...");
+        getchar();
+        return;
+    }
+    
+    // Jika hanya ada satu kelas
+    if(kelasUser->count == 1) {
+        strcpy(kelasSekarang, kelasUser->head->namaKelas);
+    } 
+    // Jika ada lebih dari satu kelas
+    else {
+        printf("\n=== Pilih Kelas ===\n");
+        NodeKelas *current = kelasUser->head;
+        int no = 1;
+        while(current != NULL) {
+            printf("%d. %s (Progress: %d%%)\n", no++, current->namaKelas, current->progress);
+            current = current->next;
+        }
+        
+        int pilihanKelas;
+        printf("\nPilih nomor kelas: ");
+        scanf("%d", &pilihanKelas);
+        system("cls");
+        getchar();
+        
+        // Validasi pilihan dan set kelasSekarang
+        if(pilihanKelas >= 1 && pilihanKelas <= kelasUser->count) {
+            current = kelasUser->head;
+            for(int i = 1; i < pilihanKelas; i++) {
+                current = current->next;
+            }
+            strcpy(kelasSekarang, current->namaKelas);
+        } else {
+            printf("Pilihan kelas tidak valid!\n");
+            printf("\nTekan Enter untuk kembali ke menu...");
+            getchar();
+            return;
+        }
+    }
 
+    // Cek apakah kelas sudah 100%
+    NodeKelas *currentKelas = kelasUser->head;
+    while(currentKelas != NULL && strcmp(currentKelas->namaKelas, kelasSekarang) != 0) {
+        currentKelas = currentKelas->next;
+    }
+    
+    if(currentKelas != NULL && currentKelas->progress == 100) {
+        printf("\nSelamat! Anda telah menyelesaikan semua modul di kelas %s!\n", kelasSekarang);
+        printf("1. Ambil Ujian\n");
+        printf("2. Kembali ke Menu Utama\n");
+        printf("Pilihan Anda: ");
+        int pilihanSelesai;
+        scanf("%d", &pilihanSelesai);
+        getchar();
+        
+        if(pilihanSelesai == 1) {
+            printf("\nMemulai Ujian untuk kelas %s...\n", kelasSekarang);
+            ikutUjian(kelasSekarang);
+        }
+        printf("\nTekan Enter untuk kembali ke menu...");
+        getchar();
+        return;
+    }
+    
+    // Menampilkan dan mengakses materi
+    int lanjutBelajar = 1;
+    while(lanjutBelajar) {
+        if(antrianBelajar->frontQ != NULL) {
+            printf("\nMateri yang sedang dipelajari: %s\n", antrianBelajar->frontQ->materi);
+            printf("1. Selesai mempelajari\n");
+            printf("2. Kembali ke menu utama\n");
+            printf("Pilihan Anda: ");
+            int pilihanMateri;
+            scanf("%d", &pilihanMateri);
+            getchar();
+            
+            if(pilihanMateri == 1) {
+                printf("\n");
+                dequeue(antrianBelajar, kelasUser, kelasSekarang);
+                
+                // Cek kembali progress setelah dequeue
+                currentKelas = kelasUser->head;
+                while(currentKelas != NULL && strcmp(currentKelas->namaKelas, kelasSekarang) != 0) {
+                    currentKelas = currentKelas->next;
+                }
+                
+                if(currentKelas != NULL && currentKelas->progress == 100) {
+                    printf("\nSelamat! Anda telah menyelesaikan semua modul di kelas %s!\n", kelasSekarang);
+                    printf("1. Ambil Ujian\n");
+                    printf("2. Kembali ke Menu Utama\n");
+                    printf("Pilihan Anda: ");
+                    int pilihanSelesai;
+                    scanf("%d", &pilihanSelesai);
+                    getchar();
+                    
+                    if(pilihanSelesai == 1) {
+                        printf("\nMemulai Ujian untuk kelas %s...\n", kelasSekarang);
+                        ikutUjian(kelasSekarang);
+                    }
+                    lanjutBelajar = 0;
+                } else if(antrianBelajar->frontQ != NULL) {
+                    printf("\nApakah Anda ingin melanjutkan belajar?\n");
+                    printf("1. Ya\n");
+                    printf("2. Tidak, kembali ke menu utama\n");
+                    printf("Pilihan Anda: ");
+                    int pilihanLanjut;
+                    scanf("%d", &pilihanLanjut);
+                    system("cls");
+                    getchar();
+                    
+                    if(pilihanLanjut != 1) {
+                        lanjutBelajar = 0;
+                    }
+                }
+            } else {
+                lanjutBelajar = 0;
+            }
+        } else {
+            printf("Selamat! Anda telah menyelesaikan semua materi di kelas ini.\n");
+            printf("1. Ambil Ujian\n");
+            printf("2. Kembali ke Menu Utama\n");
+            printf("Pilihan Anda: ");
+            int pilihanSelesai;
+            scanf("%d", &pilihanSelesai);
+            getchar();
+            
+            if(pilihanSelesai == 1) {
+                printf("\nMemulai Ujian untuk kelas %s...\n", kelasSekarang);
+                ikutUjian(kelasSekarang);
+            }
+            lanjutBelajar = 0;
+        }
+    }
+    printf("\nTekan Enter untuk kembali ke menu...");
+    getchar();
+}
 
 // Fungsi untuk DaftarKelas [rafif]
 void tambahKelas(DaftarKelas *daftar, const char *namaKelas) {
